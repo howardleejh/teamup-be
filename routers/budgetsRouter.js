@@ -4,16 +4,19 @@ const express = require('express')
 const router = express.Router()
 const budgetController = require('../controllers/budgetController')
 
-router.get('/', budgetController.budgetList)
+router.get('/users/:userId/', budgetController.budgetList)
 
-router.post('/create', budgetController.createBudgetItem)
+router.post('/users/:userId/create', budgetController.createBudgetItem)
 
-router.get('/:itemId', budgetController.budgetItem)
+router.get('/users/:userId/:itemId', budgetController.budgetItem)
 
-router.get('/:itemId/edit', budgetController.editBudgetItem)
+router.get('/users/:userId/:itemId/edit', budgetController.editBudgetItem)
 
-router.patch('/:itemId/update', budgetController.updateBudgetItem)
+router.patch('/users/:userId/:itemId/update', budgetController.updateBudgetItem)
 
-router.delete('/:itemId/delete', budgetController.deleteBudgetItem)
+router.delete(
+  '/users/:userId/:itemId/delete',
+  budgetController.deleteBudgetItem
+)
 
 module.exports = router
