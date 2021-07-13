@@ -17,6 +17,8 @@ const todosRouter = require('./routers/todosRouter')
 const eventsRouter = require('./routers/eventsRouter')
 const guestsRouter = require('./routers/guestsRouter')
 
+const todoController = require('./controllers/todoController')
+
 const app = express()
 const port = 3000
 
@@ -33,7 +35,7 @@ app.use(
   })
 )
 
-const { adminAccess } = require('./middlewares/admin_auth_middleware')
+// const  } = require('./middlewares/admin_auth_middleware')
 
 // =====================================
 //               Routes
@@ -41,13 +43,13 @@ const { adminAccess } = require('./middlewares/admin_auth_middleware')
 
 app.use('/api/v1', usersRouter)
 
-app.use('/api/v1/users/:userId/events', adminAccess, eventsRouter)
+app.use('/api/v1/users/:userId/events', eventsRouter)
 
-app.use('/api/v1/users/:userId/todo', adminAccess, todosRouter)
+app.use('/api/v1/todos', todosRouter)
 
-app.use('/api/v1/users/:userId/budget', adminAccess, budgetRouter)
+app.use('/api/v1/users/:userId/budget', budgetRouter)
 
-app.use('/api/v1/users/:userId/guests', adminAccess, guestsRouter)
+app.use('/api/v1/users/:userId/guests', guestsRouter)
 
 // =====================================
 //         Initialize MongoDB

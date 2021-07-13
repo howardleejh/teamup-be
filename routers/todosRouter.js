@@ -4,7 +4,7 @@ const express = require('express')
 const router = express.Router()
 const todoController = require('../controllers/todoController')
 
-router.get('/', todoController.todoList)
+router.get('/users/:userId', todoController.todoList)
 
 router.post('/create', todoController.createTodoItem)
 

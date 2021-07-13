@@ -8,6 +8,8 @@ module.exports = {
   todoList: async (req, res) => {
     let user = req.params.userId
 
+    console.log(req.params.userId)
+
     let todoList = await TodoModel.find({
       list_owner: user,
     })
@@ -27,7 +29,9 @@ module.exports = {
   createTodoItem: async (req, res) => {
     let user = req.params.userId
 
-    console.log(req)
+    console.log(req.body)
+
+    console.log(req.params)
 
     let createTodoValue = null
 
