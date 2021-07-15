@@ -3,17 +3,18 @@
 const express = require('express')
 const router = express.Router()
 const guestsController = require('../controllers/guestsController')
+const { userAuth } = require('../middlewares/userAuth')
 
-router.get('/users/:userId/', guestsController.guestList)
+router.get('/', userAuth, guestsController.guestList)
 
-router.post('/users/:userId/create', guestsController.createGuest)
+router.post('/create', userAuth, guestsController.createGuest)
 
-router.get('/users/:userId/:guestId', guestsController.guest)
+router.get('/:guestId', userAuth, guestsController.guest)
 
-router.get('/users/:userId/:guestId/edit', guestsController.editGuest)
+router.get('/:guestId/edit', userAuth, guestsController.editGuest)
 
-router.patch('/users/:userId/:guestId/update', guestsController.updateGuest)
+router.patch('/:guestId/update', userAuth, guestsController.updateGuest)
 
-router.delete('/users/:userId/:guestId/delete', guestsController.deleteGuest)
+router.delete('/:guestId/delete', userAuth, guestsController.deleteGuest)
 
 module.exports = router

@@ -1,18 +1,34 @@
 'use strict'
 
 const { TodoModel } = require('../models/todos')
-
-const { createToDoValidator } = require('../validatations/userValidate')
+const {
+  createToDoValidator,
+  createTodoValidator,
+} = require('../validatations/todoValidate')
+const { findUser } = require('../services/findUser')
 
 module.exports = {
   todoList: async (req, res) => {
-    let user = req.params.userId
+    let userEmail = res.locals.user.email
 
-    console.log(req.params.userId)
+    let user = await findUser(userEmail)
 
-    let todoList = await TodoModel.find({
-      list_owner: user,
-    })
+    let todoList = null
+
+    try {
+      todoList = await TodoModel.find({
+        couple_id: user.couple_id,
+      })
+    } catch (err) {
+      res.statusCode = 500
+    }
+
+    if (todoList.length === 0) {
+      res.json({
+        message: 'there is no items.',
+      })
+    }
+
     res.json(todoList)
   },
 
@@ -27,28 +43,27 @@ module.exports = {
   },
 
   createTodoItem: async (req, res) => {
-    let user = req.params.userId
+    let userEmail = res.locals.user.email
 
-    console.log(req.body)
-
-    console.log(req.params)
+    let user = await findUser(userEmail)
 
     let createTodoValue = null
 
-    // try {
-    //   createTodoValue = await createToDoValidator.validateAsync(req.body)
-    // } catch (err) {
-    //   return res.json(err)
-    // }
+    try {
+      createTodoValue = await createTodoValidator.validateAsync(req.body)
+    } catch (err) {
+      return res.json(err)
+    }
 
+    console.log(createTodoValue)
     // create todo item
 
     try {
       await TodoModel.create({
-        task: req.body.task,
-        status: req.body.status,
-        role: req.body.role,
-        list_owner: user,
+        task: createTodoValue.task,
+        status: createTodoValue.status,
+        role: createTodoValue.role,
+        couple_id: user.couple_id,
       })
       res.statusCode = 201
       return res.json()
@@ -56,6 +71,7 @@ module.exports = {
       res.statusCode = 500
       res.json(err)
     }
+    res.json({ message: 'To-do item created successfully' })
   },
 
   editTodoItem: async (req, res) => {

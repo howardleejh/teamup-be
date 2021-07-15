@@ -3,17 +3,18 @@
 const express = require('express')
 const router = express.Router()
 const eventsController = require('../controllers/eventsController')
+const { userAuth } = require('../middlewares/userAuth')
 
-router.get('/users/:userId/', eventsController.eventsList)
+router.get('/', userAuth, eventsController.eventsList)
 
-router.post('/users/:userId/create', eventsController.createEventItem)
+router.post('/create', userAuth, eventsController.createEventItem)
 
-router.get('/users/:userId/:itemId', eventsController.eventItem)
+router.get('/:eventId', userAuth, eventsController.eventItem)
 
-router.get('/users/:userId/:itemId/edit', eventsController.editEventItem)
+router.get('/:eventId/edit', userAuth, eventsController.editEventItem)
 
-router.patch('/users/:userId/:itemId/update', eventsController.updateEventItem)
+router.patch('/:eventId/update', userAuth, eventsController.updateEventItem)
 
-router.delete('/users/:userId/:itemId/delete', eventsController.deleteEventItem)
+router.delete('/:eventId/delete', userAuth, eventsController.deleteEventItem)
 
 module.exports = router

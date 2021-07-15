@@ -57,6 +57,10 @@ const userSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.Decimal128,
       required: true,
     },
+    couple_id: {
+      type: String,
+      required: true,
+    },
   },
   {
     timestamps: true,

@@ -23,9 +23,9 @@ const todoSchema = new mongoose.Schema(
       enum: ['bride', 'groom', 'both'],
       required: true,
     },
-    list_owner: {
+    couple_id: {
       type: String,
-      // required: true,
+      required: true,
     },
   },
   {

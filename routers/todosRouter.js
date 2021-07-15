@@ -3,17 +3,18 @@
 const express = require('express')
 const router = express.Router()
 const todoController = require('../controllers/todoController')
+const { userAuth } = require('../middlewares/userAuth')
 
-router.get('/users/:userId/', todoController.todoList)
+router.get('/', userAuth, todoController.todoList)
 
-router.post('/users/:userId/create', todoController.createTodoItem)
+router.post('/create', userAuth, todoController.createTodoItem)
 
-router.get('/users/:userId/:itemId', todoController.todoItem)
+router.get('/:todoId', userAuth, todoController.todoItem)
 
-router.get('/users/:userId/:itemId/edit', todoController.editTodoItem)
+router.get('/:todoId/edit', userAuth, todoController.editTodoItem)
 
-router.patch('/users/:userId/:itemId/update', todoController.updateTodoItem)
+router.patch('/:todoId/update', userAuth, todoController.updateTodoItem)
 
-router.delete('/users/:userId/:itemId/delete', todoController.deleteTodoItem)
+router.delete('/:todoId/delete', userAuth, todoController.deleteTodoItem)
 
 module.exports = router

@@ -8,6 +8,8 @@ const {
 const bcrypt = require('bcrypt')
 const moment = require('moment')
 const jwt = require('jsonwebtoken')
+const { v4: uuidv4 } = require('uuid')
+const { findUser } = require('../services/findUser')
 
 module.exports = {
   register: async (req, res) => {
@@ -32,19 +34,12 @@ module.exports = {
 
     // check if user exists in DB
 
-    let user = null
-    try {
-      user = await UserModel.findOne({
-        email: registerValue.email,
-      })
-    } catch (err) {
-      res.statusCode = 500
-      return res.json()
-    }
+    let user = await findUser(registerValue.email)
+    let partner = await findUser(registerValue.partner_email)
 
-    if (user) {
+    if (user || partner) {
       res.statusCode = 409
-      return res.json('User already exists.')
+      return res.json('User or Partner email already exists.')
     }
 
     let userRole = registerValue.role
@@ -58,6 +53,8 @@ module.exports = {
         partnerRole = 'groom'
         break
     }
+
+    let couple_id = uuidv4()
 
     // creates users account
 
@@ -74,6 +71,7 @@ module.exports = {
           hash: hash,
           d_date: registerValue.d_date,
           e_budget: registerValue.e_budget,
+          couple_id: couple_id,
         },
         {
           first_name: registerValue.partner_first_name,
@@ -86,6 +84,7 @@ module.exports = {
           hash: hash,
           d_date: registerValue.d_date,
           e_budget: registerValue.e_budget,
+          couple_id: couple_id,
         },
       ])
       res.statusCode = 201
@@ -106,14 +105,7 @@ module.exports = {
 
     // find if user exists
 
-    let user = null
-
-    try {
-      user = await UserModel.findOne({ email: loginValue.email })
-    } catch (err) {
-      res.statusCode = 500
-      return res.json(err)
-    }
+    let user = await findUser(loginValue.email)
 
     if (!user) {
       res.statusCode = 400
@@ -142,18 +134,17 @@ module.exports = {
       })
     }
 
-    let expiresAt = moment().add(1, 'hour').toString()
+    let expiresAt = moment().add(24, 'hour').toString()
 
     // generate the JWT and return as response
 
     let token = jwt.sign(
       {
-        name: user.name,
         email: user.email,
       },
       process.env.JWT_SECRET,
       {
-        expiresIn: '1h',
+        expiresIn: '24h',
       }
     )
 
@@ -163,16 +154,10 @@ module.exports = {
     })
   },
   dashboard: async (req, res) => {
-    let user = null
-    try {
-      user = await UserModel.findOne({
-        _id: req.params.userId,
-      })
-    } catch (err) {
-      res.statusCode = 500
-      return res.json()
-    }
+    let userEmail = res.locals.user.email
 
-    res.json(user)
+    let user = await findUser(userEmail)
+
+    res.json(`${user.first_name} ${user.last_name} dashboard`)
   },
 }
