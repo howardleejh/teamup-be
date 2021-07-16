@@ -1,124 +1,67 @@
 'use strict'
 
-const { TodoModel } = require('../models/todos')
-const {
-  createToDoValidator,
-  createTodoValidator,
-} = require('../validatations/todoValidate')
 const { findUser } = require('../services/findUser')
+const useFeatures = require('../services/todoFeatures')
 
 module.exports = {
   todoList: async (req, res) => {
-    let userEmail = res.locals.user.email
+    let user = await findUser(res.locals.user.email)
 
-    let user = await findUser(userEmail)
+    let todoList = await useFeatures.findList(user.couple_id)
 
-    let todoList = null
-
-    try {
-      todoList = await TodoModel.find({
-        couple_id: user.couple_id,
-      })
-    } catch (err) {
-      res.statusCode = 500
-    }
-
-    if (todoList.length === 0) {
-      res.json({
-        message: 'there is no items.',
-      })
-    }
-
-    res.json(todoList)
+    return res.json(todoList)
   },
 
   todoItem: async (req, res) => {
-    let itemId = req.params.itemId
+    let itemId = req.params.todoId
 
-    let item = await TodoModel.findOne({
-      _id: itemId,
-    })
+    let item = await useFeatures.findItem(itemId)
 
-    res.json(item)
+    return res.json(item)
   },
 
   createTodoItem: async (req, res) => {
     let userEmail = res.locals.user.email
 
-    let user = await findUser(userEmail)
-
-    let createTodoValue = null
+    let user = null
 
     try {
-      createTodoValue = await createTodoValidator.validateAsync(req.body)
+      user = await findUser(userEmail)
     } catch (err) {
       return res.json(err)
     }
 
-    console.log(createTodoValue)
-    // create todo item
+    let createItem = await useFeatures.createItem(user.couple_id, req.body)
 
-    try {
-      await TodoModel.create({
-        task: createTodoValue.task,
-        status: createTodoValue.status,
-        role: createTodoValue.role,
-        couple_id: user.couple_id,
-      })
-      res.statusCode = 201
-      return res.json()
-    } catch (err) {
+    if (createItem !== 'success') {
       res.statusCode = 500
-      res.json(err)
+      return res.json(createItem)
     }
-    res.json({ message: 'To-do item created successfully' })
-  },
-
-  editTodoItem: async (req, res) => {
-    let itemId = req.params.itemId
-
-    let item = await TodoModel.findOne({
-      _id: itemId,
-    })
-
-    res.json(item)
+    res.statusCode = 201
+    return res.json(createItem)
   },
 
   updateTodoItem: async (req, res) => {
-    let itemId = req.params.itemId
+    let itemId = req.params.todoId
 
-    try {
-      await TodoModel.findOneAndUpdate(
-        {
-          _id: itemId,
-        },
-        {
-          $set: {
-            task: req.body.task,
-            status: req.body.status,
-            role: req.body.role,
-          },
-        }
-      )
-    } catch (err) {
-      res.statusCode = 500
-      res.json(err)
+    let updateItem = await useFeatures.updateItem(itemId, req.body)
+
+    if (updateItem !== 'success') {
+      return res.json(updateItem)
     }
 
-    res.json('To-Do item is updated')
+    return res.json(updateItem)
   },
 
   deleteTodoItem: async (req, res) => {
-    let itemId = req.params.itemId
+    let itemId = req.params.todoId
 
-    try {
-      await TodoModel.findOneAndDelete({
-        _id: itemId,
-      })
-      return res.json()
-    } catch (err) {
-      res.statusCode = 500
-      res.json()
+    let deleteItem = await useFeatures.deleteItem(itemId)
+
+    if (deleteItem !== 'success') {
+      return res.json(deleteItem)
     }
+
+    return res.json(deleteItem)
   },
 }

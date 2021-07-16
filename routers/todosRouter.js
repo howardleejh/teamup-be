@@ -11,8 +11,6 @@ router.post('/create', userAuth, todoController.createTodoItem)
 
 router.get('/:todoId', userAuth, todoController.todoItem)
 
-router.get('/:todoId/edit', userAuth, todoController.editTodoItem)
-
 router.patch('/:todoId/update', userAuth, todoController.updateTodoItem)
 
 router.delete('/:todoId/delete', userAuth, todoController.deleteTodoItem)

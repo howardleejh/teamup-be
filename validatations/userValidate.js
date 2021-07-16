@@ -26,8 +26,8 @@ module.exports = {
       .required(),
     confirmPassword: Joi.ref('password'),
     role: Joi.string().valid('bride', 'groom').required(),
-    d_date: Joi.date().iso().greater('now'),
-    e_budget: Joi.number().unsafe().greater(0),
+    d_date: Joi.date().iso().greater('now').required(),
+    e_budget: Joi.number().unsafe().greater(0).required(),
   }),
   loginValidator: Joi.object({
     email: Joi.string()

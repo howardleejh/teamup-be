@@ -18,6 +18,7 @@ const budgetItemSchema = new mongoose.Schema(
     },
     payment_type: {
       type: String,
+      enum: ['credit', 'debit'],
       required: true,
     },
     category: {
@@ -34,7 +35,7 @@ const budgetItemSchema = new mongoose.Schema(
       type: String,
       max: 300,
     },
-    list_owner: {
+    couple_id: {
       type: String,
       required: true,
     },
