@@ -99,7 +99,6 @@ module.exports = {
               formatted_address: destination.data.results[0].formatted_address,
             },
             description: updateItemVal.description,
-            couple_id: user,
           },
         }
       )
