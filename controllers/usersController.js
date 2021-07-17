@@ -73,8 +73,6 @@ module.exports = {
       return res.json(err)
     }
 
-    console.log(destination.data.results)
-
     // creates users account
 
     try {
