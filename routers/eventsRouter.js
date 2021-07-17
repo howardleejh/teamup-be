@@ -11,8 +11,6 @@ router.post('/create', userAuth, eventsController.createEventItem)
 
 router.get('/:eventId', userAuth, eventsController.eventItem)
 
-router.get('/:eventId/edit', userAuth, eventsController.editEventItem)
-
 router.patch('/:eventId/update', userAuth, eventsController.updateEventItem)
 
 router.delete('/:eventId/delete', userAuth, eventsController.deleteEventItem)

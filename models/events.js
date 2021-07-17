@@ -21,8 +21,8 @@ const eventItemSchema = new mongoose.Schema(
       required: true,
     },
     location: {
-      type: String,
-      required: true,
+      name: { type: String, required: true },
+      formatted_address: String,
     },
     description: {
       type: String,

@@ -57,19 +57,14 @@ module.exports = {
 
     let couple_id = uuidv4()
 
+    let destination = null
+
     try {
-      let destination = await axios.get(
-        'https://maps.googleapis.com/maps/api/place/findplacefromtext/json',
+      destination = await axios.get(
+        'https://maps.googleapis.com/maps/api/place/textsearch/json',
         {
           params: {
-            input: registerValue.d_destination,
-            inputtype: textquery,
-            fields: photos,
-            formatted_address,
-            name,
-            rating,
-            opening_hours,
-            geometry,
+            query: registerValue.d_destination,
             key: process.env.GOOG_API,
           },
         }
@@ -78,7 +73,7 @@ module.exports = {
       return res.json(err)
     }
 
-    console.log(destination)
+    console.log(destination.data.results)
 
     // creates users account
 
@@ -94,7 +89,10 @@ module.exports = {
           role: registerValue.role,
           hash: hash,
           d_date: registerValue.d_date,
-          d_destination: destination,
+          d_destination: {
+            name: destination.data.results[0].name,
+            formatted_address: destination.data.results[0].formatted_address,
+          },
           e_budget: registerValue.e_budget,
           couple_id: couple_id,
         },
@@ -108,13 +106,16 @@ module.exports = {
           role: partnerRole,
           hash: hash,
           d_date: registerValue.d_date,
-          d_destination: destination,
+          d_destination: {
+            name: destination.data.results[0].name,
+            formatted_address: destination.data.results[0].formatted_address,
+          },
           e_budget: registerValue.e_budget,
           couple_id: couple_id,
         },
       ])
       res.statusCode = 201
-      return res.json()
+      return res.json('success')
     } catch (err) {
       res.statusCode = 500
       res.json(err)
