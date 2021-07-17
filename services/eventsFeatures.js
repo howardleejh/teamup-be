@@ -2,7 +2,7 @@
 
 const { EventItemModel } = require('../models/events')
 const { createEventValidator } = require('../validatations/eventValidate')
-const axios = require('axios')
+const { googApi } = require('../services/googleApi')
 
 module.exports = {
   findList: async (user) => {
@@ -46,24 +46,11 @@ module.exports = {
       return err
     }
 
-    let destination = null
+    let destination = await googApi(createItemVal.location)
 
-    try {
-      destination = await axios.get(
-        'https://maps.googleapis.com/maps/api/place/textsearch/json',
-        {
-          params: {
-            query: 'Bedok Mall',
-            key: process.env.GOOG_API,
-          },
-        }
-      )
-    } catch (err) {
-      return err
+    if (!destination) {
+      return destination
     }
-
-    console.log(3)
-    console.log(destination)
 
     try {
       await EventItemModel.create({
@@ -91,6 +78,12 @@ module.exports = {
       return err
     }
 
+    let destination = await googApi(updateItemVal.location)
+
+    if (!destination) {
+      return destination
+    }
+
     try {
       await EventItemModel.findOneAndUpdate(
         {
@@ -98,15 +91,22 @@ module.exports = {
         },
         {
           $set: {
-            task: updateItemVal.task,
-            status: updateItemVal.status,
-            role: updateItemVal.role,
+            event_name: updateItemVal.event_name,
+            from: updateItemVal.from,
+            to: updateItemVal.to,
+            location: {
+              name: destination.data.results[0].name,
+              formatted_address: destination.data.results[0].formatted_address,
+            },
+            description: updateItemVal.description,
+            couple_id: user,
           },
         }
       )
     } catch (err) {
       return err
     }
+
     return 'success'
   },
   deleteItem: async (itemId) => {
