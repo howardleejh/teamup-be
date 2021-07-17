@@ -58,7 +58,7 @@ module.exports = {
         }
       )
     } catch (err) {
-      return res.json(err)
+      return err
     }
 
     try {
