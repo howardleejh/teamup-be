@@ -12,11 +12,11 @@ const eventItemSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    start: {
+    from: {
       type: Date,
       required: true,
     },
-    end: {
+    to: {
       type: Date,
       required: true,
     },
@@ -38,7 +38,7 @@ const eventItemSchema = new mongoose.Schema(
   }
 )
 
-const eventItemModel = mongoose.model('event_item', eventItemSchema)
+const eventItemModel = mongoose.model('event', eventItemSchema)
 
 module.exports = {
   EventItemModel: eventItemModel,

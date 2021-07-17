@@ -2,6 +2,7 @@
 
 const { EventItemModel } = require('../models/events')
 const { createEventValidator } = require('../validatations/eventValidate')
+const axios = require('axios')
 
 module.exports = {
   findList: async (user) => {
@@ -52,7 +53,7 @@ module.exports = {
         'https://maps.googleapis.com/maps/api/place/textsearch/json',
         {
           params: {
-            query: registerValue.d_destination,
+            query: 'Bedok Mall',
             key: process.env.GOOG_API,
           },
         }
@@ -60,6 +61,9 @@ module.exports = {
     } catch (err) {
       return err
     }
+
+    console.log(3)
+    console.log(destination)
 
     try {
       await EventItemModel.create({
