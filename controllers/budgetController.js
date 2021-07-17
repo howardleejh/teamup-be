@@ -1,51 +1,67 @@
 'use strict'
 
-const { BudgetItemModel } = require('../models/budgets')
-const { createBudgetValidator } = require('../validatations/budgetValidate')
 const { findUser } = require('../services/findUser')
+const useFeatures = require('../services/budgetFeatures')
 
 module.exports = {
   budgetList: async (req, res) => {
+    let user = await findUser(res.locals.user.email)
+
+    let budgetList = await useFeatures.findList(user.couple_id)
+
+    return res.json(budgetList)
+  },
+
+  budgetItem: async (req, res) => {
+    let itemId = req.params.budgetId
+
+    let item = await useFeatures.findItem(itemId)
+
+    return res.json(item)
+  },
+
+  createBudgetItem: async (req, res) => {
     let userEmail = res.locals.user.email
 
-    let user = await findUser(userEmail)
-
-    let budgetList = null
+    let user = null
 
     try {
-      budgetList = await BudgetItemModel.find({
-        couple_id: user.couple_id,
-      })
+      user = await findUser(userEmail)
     } catch (err) {
+      return res.json(err)
+    }
+
+    let createItem = await useFeatures.createItem(user.couple_id, req.body)
+
+    if (createItem !== 'success') {
       res.statusCode = 500
+      return res.json(createItem)
+    }
+    res.statusCode = 201
+    return res.json(createItem)
+  },
+
+  updateBudgetItem: async (req, res) => {
+    let itemId = req.params.budgetId
+
+    let updateItem = await useFeatures.updateItem(itemId, req.body)
+
+    if (updateItem !== 'success') {
+      return res.json(updateItem)
     }
 
-    if (budgetList.length === 0) {
-      res.json({
-        message: 'there is no items.',
-      })
+    return res.json(updateItem)
+  },
+
+  deleteBudgetItem: async (req, res) => {
+    let itemId = req.params.budgetId
+
+    let deleteItem = await useFeatures.deleteItem(itemId)
+
+    if (deleteItem !== 'success') {
+      return res.json(deleteItem)
     }
 
-    res.json(budgetList)
-  },
-
-  budgetItem: (req, res) => {
-    res.json('this is budget item')
-  },
-
-  createBudgetItem: (req, res) => {
-    res.json('budget item is created')
-  },
-
-  editBudgetItem: (req, res) => {
-    res.json('budget item is edited')
-  },
-
-  updateBudgetItem: (req, res) => {
-    res.json('budget item is updated')
-  },
-
-  deleteBudgetItem: (req, res) => {
-    res.json('budget item is deleted')
+    return res.json(deleteItem)
   },
 }

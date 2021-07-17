@@ -9,6 +9,6 @@ module.exports = {
     payment_type: Joi.string().valid('credit', 'debit').required(),
     category: Joi.string().min(3),
     status: Joi.string().valid('not paid', 'paid').required(),
-    description: Joi.string().max(300),
+    description: Joi.string().max(300).empty(''),
   }),
 }

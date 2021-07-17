@@ -1,13 +1,13 @@
 'use strict'
 
-const { TodoModel } = require('../models/todos')
-const { createTodoValidator } = require('../validatations/todoValidate')
+const { BudgetItemModel } = require('../models/budgets')
+const { createBudgetValidator } = require('../validatations/budgetValidate')
 
 module.exports = {
   findList: async (user) => {
     let list = null
     try {
-      list = await TodoModel.find({
+      list = await BudgetItemModel.find({
         couple_id: user,
       })
     } catch (err) {
@@ -23,7 +23,7 @@ module.exports = {
   findItem: async (itemId) => {
     let item = null
     try {
-      item = await TodoModel.find({
+      item = await BudgetItemModel.find({
         _id: itemId,
       })
     } catch (err) {
@@ -40,16 +40,19 @@ module.exports = {
     let createItemVal = null
 
     try {
-      createItemVal = await createTodoValidator.validateAsync(input)
+      createItemVal = await createBudgetValidator.validateAsync(input)
     } catch (err) {
       return err
     }
 
     try {
-      await TodoModel.create({
-        task: createItemVal.task,
+      await BudgetItemModel.create({
+        item_name: createItemVal.item_name,
+        amount: createItemVal.amount,
+        payment_type: createItemVal.payment_type,
+        category: createItemVal.category,
         status: createItemVal.status,
-        role: createItemVal.role,
+        description: createItemVal.description,
         couple_id: user,
       })
     } catch (err) {
@@ -61,21 +64,24 @@ module.exports = {
     let updateItemVal = null
 
     try {
-      updateItemVal = await createTodoValidator.validateAsync(input)
+      updateItemVal = await createBudgetValidator.validateAsync(input)
     } catch (err) {
       return err
     }
 
     try {
-      await TodoModel.findOneAndUpdate(
+      await BudgetItemModel.findOneAndUpdate(
         {
           _id: itemId,
         },
         {
           $set: {
-            task: updateItemVal.task,
+            item_name: updateItemVal.item_name,
+            amount: updateItemVal.amount,
+            payment_type: updateItemVal.payment_type,
+            category: updateItemVal.category,
             status: updateItemVal.status,
-            role: updateItemVal.role,
+            description: updateItemVal.description,
           },
         }
       )
@@ -86,7 +92,7 @@ module.exports = {
   },
   deleteItem: async (itemId) => {
     try {
-      await TodoModel.findOneAndDelete({
+      await BudgetItemModel.findOneAndDelete({
         _id: itemId,
       })
     } catch (err) {

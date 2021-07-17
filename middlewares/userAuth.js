@@ -1,6 +1,7 @@
 'use strict'
 
 const jwt = require('jsonwebtoken')
+const { GuestModel } = require('../models/guests')
 
 module.exports = {
   userAuth: (req, res, next) => {
@@ -8,7 +9,7 @@ module.exports = {
 
     if (!authToken || authToken === null) {
       res.statusCode = 401
-      res.json({
+      return res.json({
         message: 'no authentication token found',
       })
     }
@@ -26,6 +27,35 @@ module.exports = {
 
     res.locals.user = user
 
+    next()
+  },
+  guestAuth: async (req, res, next) => {
+    let guestAuth = req.body.guest_contact
+
+    if (!guestAuth || guestAuth === null) {
+      res.statusCode = 401
+      return res.json({
+        message: 'no guest authentication found',
+      })
+    }
+
+    let guest = null
+
+    try {
+      guest = await GuestModel.findOne({
+        guest_contact: req.body.guest_contact,
+      })
+    } catch (err) {
+      return err
+    }
+
+    if (!guest) {
+      res.status = 403
+      return res.json({
+        message: 'guest is not authenticated',
+      })
+    }
+    res.locals.user = guest
     next()
   },
 }

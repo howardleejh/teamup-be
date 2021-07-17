@@ -11,8 +11,6 @@ router.post('/create', userAuth, budgetController.createBudgetItem)
 
 router.get('/:budgetId', userAuth, budgetController.budgetItem)
 
-router.get('/:budgetId/edit', userAuth, budgetController.editBudgetItem)
-
 router.patch('/:budgetId/update', userAuth, budgetController.updateBudgetItem)
 
 router.delete('/:budgetId/delete', userAuth, budgetController.deleteBudgetItem)

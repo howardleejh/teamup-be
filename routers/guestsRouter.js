@@ -11,8 +11,6 @@ router.post('/create', userAuth, guestsController.createGuest)
 
 router.get('/:guestId', userAuth, guestsController.guest)
 
-router.get('/:guestId/edit', userAuth, guestsController.editGuest)
-
 router.patch('/:guestId/update', userAuth, guestsController.updateGuest)
 
 router.delete('/:guestId/delete', userAuth, guestsController.deleteGuest)

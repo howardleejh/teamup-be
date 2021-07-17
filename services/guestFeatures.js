@@ -1,13 +1,13 @@
 'use strict'
 
-const { TodoModel } = require('../models/todos')
-const { createTodoValidator } = require('../validatations/todoValidate')
+const { GuestModel } = require('../models/guests')
+const { createGuestValidator } = require('../validatations/guestValidate')
 
 module.exports = {
   findList: async (user) => {
     let list = null
     try {
-      list = await TodoModel.find({
+      list = await GuestModel.find({
         couple_id: user,
       })
     } catch (err) {
@@ -23,7 +23,7 @@ module.exports = {
   findItem: async (itemId) => {
     let item = null
     try {
-      item = await TodoModel.find({
+      item = await GuestModel.find({
         _id: itemId,
       })
     } catch (err) {
@@ -40,16 +40,19 @@ module.exports = {
     let createItemVal = null
 
     try {
-      createItemVal = await createTodoValidator.validateAsync(input)
+      createItemVal = await createGuestValidator.validateAsync(input)
     } catch (err) {
       return err
     }
 
     try {
-      await TodoModel.create({
-        task: createItemVal.task,
-        status: createItemVal.status,
+      await GuestModel.create({
+        guest_first_name: createItemVal.guest_first_name,
+        guest_last_name: createItemVal.guest_last_name,
+        guest_contact: createItemVal.guest_contact,
         role: createItemVal.role,
+        status: createItemVal.status,
+        pax: createItemVal.pax,
         couple_id: user,
       })
     } catch (err) {
@@ -61,32 +64,36 @@ module.exports = {
     let updateItemVal = null
 
     try {
-      updateItemVal = await createTodoValidator.validateAsync(input)
+      updateItemVal = await createGuestValidator.validateAsync(input)
     } catch (err) {
       return err
     }
 
     try {
-      await TodoModel.findOneAndUpdate(
+      await GuestModel.findOneAndUpdate(
         {
           _id: itemId,
         },
         {
           $set: {
-            task: updateItemVal.task,
-            status: updateItemVal.status,
+            guest_first_name: updateItemVal.guest_first_name,
+            guest_last_name: updateItemVal.guest_last_name,
+            guest_contact: updateItemVal.guest_contact,
             role: updateItemVal.role,
+            status: updateItemVal.status,
+            pax: updateItemVal.pax,
           },
         }
       )
     } catch (err) {
       return err
     }
+
     return 'success'
   },
   deleteItem: async (itemId) => {
     try {
-      await TodoModel.findOneAndDelete({
+      await GuestModel.findOneAndDelete({
         _id: itemId,
       })
     } catch (err) {

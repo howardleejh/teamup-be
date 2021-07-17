@@ -19,6 +19,7 @@ const guestSchema = new mongoose.Schema(
     guest_contact: {
       type: Number,
       required: true,
+      unique: true,
     },
     role: {
       type: String,
@@ -35,7 +36,7 @@ const guestSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    list_owner: {
+    couple_id: {
       type: String,
       required: true,
     },
