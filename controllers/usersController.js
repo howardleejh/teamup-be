@@ -10,6 +10,7 @@ const moment = require('moment')
 const jwt = require('jsonwebtoken')
 const { v4: uuidv4 } = require('uuid')
 const { findUser } = require('../services/findUser')
+const axios = require('axios')
 
 module.exports = {
   register: async (req, res) => {
@@ -56,6 +57,29 @@ module.exports = {
 
     let couple_id = uuidv4()
 
+    try {
+      let destination = await axios.get(
+        'https://maps.googleapis.com/maps/api/place/findplacefromtext/json',
+        {
+          params: {
+            input: registerValue.d_destination,
+            inputtype: textquery,
+            fields: photos,
+            formatted_address,
+            name,
+            rating,
+            opening_hours,
+            geometry,
+            key: process.env.GOOG_API,
+          },
+        }
+      )
+    } catch (err) {
+      return res.json(err)
+    }
+
+    console.log(destination)
+
     // creates users account
 
     try {
@@ -70,6 +94,7 @@ module.exports = {
           role: registerValue.role,
           hash: hash,
           d_date: registerValue.d_date,
+          d_destination: destination,
           e_budget: registerValue.e_budget,
           couple_id: couple_id,
         },
@@ -83,6 +108,7 @@ module.exports = {
           role: partnerRole,
           hash: hash,
           d_date: registerValue.d_date,
+          d_destination: destination,
           e_budget: registerValue.e_budget,
           couple_id: couple_id,
         },

@@ -53,6 +53,20 @@ const userSchema = new mongoose.Schema(
       type: Date,
       required: true,
     },
+    d_destination: {
+      name: String,
+      location: {
+        type: {
+          type: String,
+          enum: ['Point'],
+          required: true,
+        },
+        coordinates: {
+          type: [Number],
+          required: true,
+        },
+      },
+    },
     e_budget: {
       type: mongoose.Schema.Types.Decimal128,
       required: true,

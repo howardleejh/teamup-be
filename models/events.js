@@ -12,20 +12,12 @@ const eventItemSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    start_date: {
-      type: String,
+    start: {
+      type: Date,
       required: true,
     },
-    end_date: {
-      type: String,
-      required: true,
-    },
-    start_time: {
-      type: String,
-      required: true,
-    },
-    end_time: {
-      type: String,
+    end: {
+      type: Date,
       required: true,
     },
     location: {
@@ -36,7 +28,7 @@ const eventItemSchema = new mongoose.Schema(
       type: String,
       max: 300,
     },
-    list_owner: {
+    couple_id: {
       type: String,
       required: true,
     },
