@@ -169,10 +169,52 @@ module.exports = {
     })
   },
   dashboard: async (req, res) => {
-    let userEmail = res.locals.user.email
-
-    let user = await findUser(userEmail)
+    let user = await findUser(res.locals.user.email)
 
     res.json(`${user.first_name} ${user.last_name} dashboard`)
+  },
+  userProfile: async (req, res) => {
+    let user = await findUser(res.locals.email)
+
+    res.json(user)
+  },
+  updateUserProfile: async (req, res) => {
+    let user = await findUser(res.locals.email)
+
+    let updateProfileValue = null
+
+    try {
+      updateProfileValue = await registerValidator.validateAsync(req.body)
+    } catch (err) {
+      return res.json(err)
+    }
+
+    console.log(updateProfileValue)
+
+    try {
+      await UserModel.findOneAndUpdate(
+        {
+          email: user.email,
+        },
+        {
+          $set: {
+            first_name: updateProfileValue.first_name,
+            last_name: updateProfileValue.last_name,
+            email: updateProfileValue.email,
+            hash: hash,
+            d_date: updateProfileValue.d_date,
+            d_destination: {
+              name: destination.data.results[0].name,
+              formatted_address: destination.data.results[0].formatted_address,
+            },
+            e_budget: registerValue.e_budget,
+          },
+        }
+      )
+    } catch (err) {
+      return err
+    }
+
+    return res.json('success')
   },
 }
