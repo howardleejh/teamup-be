@@ -17,9 +17,8 @@ const todosRouter = require('./routers/todosRouter')
 const eventsRouter = require('./routers/eventsRouter')
 const guestsRouter = require('./routers/guestsRouter')
 
-const todoController = require('./controllers/todoController')
-
 const app = express()
+const cors = require('cors')
 const port = process.env.PORT || 3000
 
 // =====================================
@@ -28,6 +27,7 @@ const port = process.env.PORT || 3000
 
 // setting middleware to accept json and urlencoded request body
 
+app.use(cors({ origin: '*' }))
 app.use(express.json())
 app.use(
   express.urlencoded({
