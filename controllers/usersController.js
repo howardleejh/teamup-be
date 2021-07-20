@@ -174,12 +174,16 @@ module.exports = {
     res.json(`${user.first_name} ${user.last_name} dashboard`)
   },
   userProfile: async (req, res) => {
-    let user = await findUser(res.locals.email)
+    let user = await findUser(res.locals.user.email)
+
+    if (!user) {
+      res.json('user not found')
+    }
 
     res.json(user)
   },
   updateUserProfile: async (req, res) => {
-    let user = await findUser(res.locals.email)
+    let user = await findUser(res.locals.user.email)
 
     let updateProfileValue = null
 
