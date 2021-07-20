@@ -6,8 +6,10 @@ const usersController = require('../controllers/usersController')
 const guestsController = require('../controllers/guestsController')
 const { userAuth, guestAuth } = require('../middlewares/userAuth')
 
-router.post(
-  '/users/user-profile/update',
+router.delete('/users/profile/delete', userAuth, usersController.deleteUser)
+
+router.patch(
+  '/users/profile/update',
   userAuth,
   usersController.updateUserProfile
 )

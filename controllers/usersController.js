@@ -177,7 +177,8 @@ module.exports = {
     let user = await findUser(res.locals.user.email)
 
     if (!user) {
-      res.json('user not found')
+      res.statusCode = 500
+      return res.json()
     }
 
     res.json(user)
@@ -185,15 +186,33 @@ module.exports = {
   updateUserProfile: async (req, res) => {
     let user = await findUser(res.locals.user.email)
 
-    let updateProfileValue = null
+    let newHash = null
 
-    try {
-      updateProfileValue = await registerValidator.validateAsync(req.body)
-    } catch (err) {
-      return res.json(err)
+    if (req.body.password.length === 0) {
+      newHash = user.hash
+    } else {
+      try {
+        newHash = await bcrypt.hash(req.body.password, 10)
+      } catch (err) {
+        return err
+      }
     }
 
-    console.log(updateProfileValue)
+    let newDestination = null
+
+    if (!req.body.d_destination || req.body.d_destination === null) {
+      newDestination = {
+        name: user.d_destination.name,
+        formatted_address: user.d_destination.formatted_address,
+      }
+    } else {
+      let response = await googApi(req.body.d_destination)
+
+      newDestination = {
+        name: response.data.results[0].name,
+        formatted_address: response.data.results[0].formatted_address,
+      }
+    }
 
     try {
       await UserModel.findOneAndUpdate(
@@ -202,23 +221,59 @@ module.exports = {
         },
         {
           $set: {
-            first_name: updateProfileValue.first_name,
-            last_name: updateProfileValue.last_name,
-            email: updateProfileValue.email,
-            hash: hash,
-            d_date: updateProfileValue.d_date,
+            first_name: req.body.first_name || user.first_name,
+            last_name: req.body.last_name || user.last_name,
+            email: req.body.email || user.email,
+            hash: newHash,
+            d_date: req.body.d_date || user.d_date,
             d_destination: {
-              name: destination.data.results[0].name,
-              formatted_address: destination.data.results[0].formatted_address,
+              name: newDestination.name,
+              formatted_address: newDestination.formatted_address,
             },
-            e_budget: registerValue.e_budget,
+            e_budget: req.body.e_budget || user.e_budget,
           },
         }
       )
     } catch (err) {
-      return err
+      res.statusCode = 500
+      res.json(err)
     }
 
     return res.json('success')
+  },
+  deleteUser: async (req, res) => {
+    let user = await findUser(res.locals.user.email)
+    let deleteBothUsers = false
+
+    if (!req.body.deleteBothUsers || req.body.deleteBothUsers === null) {
+      deleteBothUsers = false
+    } else {
+      deleteBothUsers = true
+    }
+
+    if (deleteBothUsers) {
+      try {
+        await UserModel.deleteMany({
+          couple_id: user.couple_id,
+        })
+      } catch (err) {
+        res.statusCode = 500
+        return res.json(err)
+      }
+      res.statusCode = 204
+      return res.json()
+    }
+
+    try {
+      await UserModel.findOneAndDelete({
+        email: user.email,
+      })
+    } catch (err) {
+      res.statusCode = 500
+      return res.json(err)
+    }
+
+    res.statusCode = 204
+    res.json()
   },
 }
