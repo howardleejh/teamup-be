@@ -12,31 +12,37 @@ const jwt = require('jsonwebtoken')
 const { v4: uuidv4 } = require('uuid')
 const { findUser } = require('../services/findUser')
 const { googApi } = require('../services/googleApi')
+const randomstring = require('randomstring')
+const { sendMail } = require('../services/emailService')
 
 module.exports = {
   register: async (req, res) => {
-    let userRegisterValue = null
+    let userInput = null
 
     try {
-      userRegisterValue = await userRegisterValidator.validateAsync(req.body)
+      userInput = await userRegisterValidator.validateAsync(req.body)
     } catch (err) {
       return res.json(err)
     }
+
+    const fullName = userInput.fullName.split(' ')
+    const firstName = fullName[0]
+    const lastName = fullName[1]
 
     // generate hash for password
 
     let hash = ''
 
     try {
-      hash = await bcrypt.hash(userRegisterValue.confirmPassword, 10)
+      hash = await bcrypt.hash(randomstring.generate(), 10)
     } catch (err) {
       res.statusCode = 500
-      return res.json()
+      return res.json(err)
     }
 
     // check if user exists in DB
 
-    let user = await findUser(userRegisterValue.email)
+    let user = await findUser(userInput.email)
 
     if (user) {
       res.statusCode = 409
@@ -45,55 +51,122 @@ module.exports = {
 
     let couple_id = uuidv4()
 
+    let userQuery = randomstring.generate(128)
+
     // creates users account
 
     try {
       UserModel.create({
-        first_name: userRegisterValue.first_name,
-        last_name: userRegisterValue.last_name,
-        email: userRegisterValue.email,
-        role: userRegisterValue.role,
+        first_name: firstName,
+        last_name: lastName,
+        email: userInput.email,
+        role: userInput.role,
         hash: hash,
         couple_id: couple_id,
+        active: false,
+        activation: userQuery,
       })
-      res.statusCode = 201
-      return res.json('success')
     } catch (err) {
       res.statusCode = 500
-      res.json(err)
-    }
-  },
-  registerPartner: async (req, res) => {
-    let partnerRegisterValue = null
-
-    try {
-      partnerRegisterValue = await registerValidator.validateAsync(req.body)
-    } catch (err) {
       return res.json(err)
     }
 
-    // // generate hash for password
+    try {
+      sendMail(
+        'vault2howard@gmail.com',
+        'Change of Password',
+        `Please click on the following link to change your password immediately: 
+        
+        http://localhost:3000/api/v1/pass/${userQuery}`
+      )
+    } catch (err) {
+      return res.json(err)
+    }
+    res.statusCode = 201
+    return res.json('success')
+  },
+  newUserPassChange: async (req, res) => {
+    let userId = req.params.userRoute
+    let password = req.body.password
+    let confirmPass = req.body.confirmPass
 
-    // let hash = ''
-
-    // try {
-    //   hash = await bcrypt.hash(partnerRegisterValue.confirmPassword, 10)
-    // } catch (err) {
-    //   res.statusCode = 500
-    //   return res.json()
-    // }
-
-    // check if user exists in DB
-
-    let user = await findUser(partnerRegisterValue.email)
-    let partner = await findUser(partnerRegisterValue.partner_email)
-
-    if (user || partner) {
-      res.statusCode = 409
-      return res.json('User or Partner email already exists.')
+    if (password !== confirmPass) {
+      return res.json('password does not match.')
     }
 
-    let userRole = partnerRegisterValue.role
+    let user = null
+
+    try {
+      user = await UserModel.findOne({
+        activation: userId,
+      })
+    } catch (err) {
+      res.statusCode = 404
+      return res.json(err)
+    }
+
+    if (user.active) {
+      res.statusCode = 503
+      return res.json('user account has already been activated.')
+    }
+
+    // generate hash for Password
+
+    let hash = ''
+
+    try {
+      hash = await bcrypt.hash(confirmPass, 10)
+    } catch (err) {
+      res.statusCode = 500
+      return res.json()
+    }
+
+    try {
+      await UserModel.findOneAndUpdate(
+        {
+          email: user.email,
+        },
+        {
+          $set: {
+            hash: hash,
+            active: true,
+          },
+        }
+      )
+      res.json('success')
+    } catch (err) {
+      res.statusCode = 500
+      return res.json(err)
+    }
+  },
+  registerPartner: async (req, res) => {
+    let user = await findUser(res.locals.user.email)
+
+    const fullName = req.body.fullName.split(' ')
+    const firstName = fullName[0]
+    const lastName = fullName[1]
+
+    // generate hash for password
+
+    let hash = ''
+
+    try {
+      hash = await bcrypt.hash(randomstring.generate(), 10)
+    } catch (err) {
+      res.statusCode = 500
+      return res.json()
+    }
+
+    // check if partner exists in DB
+
+    let partner = await findUser(req.body.email)
+
+    if (partner) {
+      res.statusCode = 409
+      return res.json('Partner email already exists.')
+    }
+
+    let userRole = user.role
     let partnerRole = null
 
     switch (userRole) {
@@ -105,59 +178,41 @@ module.exports = {
         break
     }
 
-    let couple_id = uuidv4()
+    let couple_id = user.couple_id
 
-    let destination = await googApi(userRegisterValue.d_destination)
+    let userQuery = randomstring.generate(128)
 
-    if (!destination) {
-      return res.json(destination)
-    }
-
-    // creates users account
+    // // creates users account
 
     try {
-      UserModel.insertMany([
-        {
-          first_name: userRegisterValue.first_name,
-          last_name: userRegisterValue.last_name,
-          email: userRegisterValue.email,
-          partner_first_name: userRegisterValue.partner_first_name,
-          partner_last_name: userRegisterValue.partner_last_name,
-          partner_email: userRegisterValue.partner_email,
-          role: userRegisterValue.role,
-          hash: hash,
-          d_date: userRegisterValue.d_date,
-          d_destination: {
-            name: destination.data.results[0].name,
-            formatted_address: destination.data.results[0].formatted_address,
-          },
-          e_budget: userRegisterValue.e_budget,
-          couple_id: couple_id,
-        },
-        {
-          first_name: userRegisterValue.partner_first_name,
-          last_name: userRegisterValue.partner_last_name,
-          email: userRegisterValue.partner_email,
-          partner_first_name: userRegisterValue.first_name,
-          partner_last_name: userRegisterValue.last_name,
-          partner_email: userRegisterValue.email,
-          role: partnerRole,
-          hash: hash,
-          d_date: userRegisterValue.d_date,
-          d_destination: {
-            name: destination.data.results[0].name,
-            formatted_address: destination.data.results[0].formatted_address,
-          },
-          e_budget: userRegisterValue.e_budget,
-          couple_id: couple_id,
-        },
-      ])
-      res.statusCode = 201
-      return res.json('success')
+      UserModel.create({
+        first_name: firstName,
+        last_name: lastName,
+        email: req.body.email,
+        role: partnerRole,
+        hash: hash,
+        couple_id: couple_id,
+        active: false,
+        activation: userQuery,
+      })
     } catch (err) {
       res.statusCode = 500
-      res.json(err)
+      return res.json(err)
     }
+
+    try {
+      sendMail(
+        'vault2howard@gmail.com',
+        'Change of Password',
+        `Please click on the following link to change your password immediately:
+
+        http://localhost:3000/api/v1/${userQuery}`
+      )
+    } catch (err) {
+      return res.json(err)
+    }
+    res.statusCode = 201
+    return res.json('success')
   },
   login: async (req, res) => {
     let loginValue = null
@@ -216,6 +271,7 @@ module.exports = {
     res.json({
       token: token,
       expiresAt: expiresAt,
+      message: 'success',
     })
   },
   dashboard: async (req, res) => {
@@ -256,11 +312,15 @@ module.exports = {
         formatted_address: user.d_destination.formatted_address,
       }
     } else {
-      let response = await googApi(req.body.d_destination)
+      try {
+        let response = await googApi(req.body.d_destination)
 
-      newDestination = {
-        name: response.data.results[0].name,
-        formatted_address: response.data.results[0].formatted_address,
+        newDestination = {
+          name: response.data.results[0].name,
+          formatted_address: response.data.results[0].formatted_address,
+        }
+      } catch (err) {
+        return err
       }
     }
 
@@ -275,6 +335,21 @@ module.exports = {
             last_name: req.body.last_name || user.last_name,
             email: req.body.email || user.email,
             hash: newHash,
+          },
+        }
+      )
+    } catch (err) {
+      res.statusCode = 500
+      return err
+    }
+
+    try {
+      await UserModel.updateMany(
+        {
+          couple_id: user.couple_id,
+        },
+        {
+          $set: {
             d_date: req.body.d_date || user.d_date,
             d_destination: {
               name: newDestination.name,
@@ -286,7 +361,7 @@ module.exports = {
       )
     } catch (err) {
       res.statusCode = 500
-      res.json(err)
+      return res.json(err)
     }
 
     return res.json('success')

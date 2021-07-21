@@ -18,11 +18,17 @@ router.get('/users/profile', userAuth, usersController.userProfile)
 
 router.get('/users/dashboard', userAuth, usersController.dashboard)
 
-router.post('/users/partner/register', usersController.registerPartner)
+router.post(
+  '/users/partner/register',
+  userAuth,
+  usersController.registerPartner
+)
 
 router.post('/register', usersController.register)
 
 router.post('/login', usersController.login)
+
+router.post('/:userRoute', usersController.newUserPassChange)
 
 router.post('/guests/login', guestAuth, guestsController.loginGuest)
 

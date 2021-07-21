@@ -1,5 +1,6 @@
 'use strict'
 
+const { boolean } = require('joi')
 const mongoose = require('mongoose')
 
 //=========================================
@@ -21,49 +22,38 @@ const userSchema = new mongoose.Schema(
     email: {
       type: String,
       required: true,
-      max: 100,
+      max: 50,
       unique: true,
+      lowercase: true,
     },
     hash: {
       type: String,
-      required: true,
     },
     role: {
       type: String,
       enum: ['bride', 'groom'],
       required: true,
     },
-    partner_first_name: {
-      type: String,
-      required: true,
-      max: 20,
-    },
-    partner_last_name: {
-      type: String,
-      required: true,
-      max: 20,
-    },
-    partner_email: {
-      type: String,
-      required: true,
-      max: 100,
-      unique: true,
-    },
     d_date: {
       type: Date,
-      required: true,
     },
     d_destination: {
-      name: { type: String, required: true },
+      name: { type: String },
       formatted_address: String,
     },
     e_budget: {
       type: mongoose.Schema.Types.Decimal128,
-      required: true,
     },
     couple_id: {
       type: String,
       required: true,
+    },
+    active: {
+      type: Boolean,
+      required: true,
+    },
+    activation: {
+      type: String,
     },
   },
   {
