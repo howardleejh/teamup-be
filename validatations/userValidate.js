@@ -3,7 +3,23 @@
 const Joi = require('joi')
 
 module.exports = {
-  registerValidator: Joi.object({
+  userRegisterValidator: Joi.object({
+    first_name: Joi.string().alphanum().min(3).max(20).required(),
+    last_name: Joi.string().alphanum().max(20).required(),
+    email: Joi.string()
+      .email({
+        minDomainSegments: 2,
+        tlds: { allow: ['com', 'net'] },
+      })
+      .required(),
+    password: Joi.string()
+      .min(3)
+      .pattern(new RegExp('^[a-zA-Z0-9]{3,30}$'))
+      .required(),
+    confirmPassword: Joi.ref('password'),
+    role: Joi.string().valid('bride', 'groom').required(),
+  }),
+  partnerRegisterValidator: Joi.object({
     first_name: Joi.string().alphanum().min(3).max(20).required(),
     last_name: Joi.string().alphanum().max(20).required(),
     email: Joi.string()

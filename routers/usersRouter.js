@@ -18,6 +18,8 @@ router.get('/users/profile', userAuth, usersController.userProfile)
 
 router.get('/users/dashboard', userAuth, usersController.dashboard)
 
+router.post('/users/partner/register', usersController.registerPartner)
+
 router.post('/register', usersController.register)
 
 router.post('/login', usersController.login)

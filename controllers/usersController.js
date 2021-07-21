@@ -2,7 +2,8 @@
 
 const { UserModel } = require('../models/users')
 const {
-  registerValidator,
+  userRegisterValidator,
+  partnerRegisterValidator,
   loginValidator,
 } = require('../validatations/userValidate')
 const bcrypt = require('bcrypt')
@@ -14,10 +15,10 @@ const { googApi } = require('../services/googleApi')
 
 module.exports = {
   register: async (req, res) => {
-    let registerValue = null
+    let userRegisterValue = null
 
     try {
-      registerValue = await registerValidator.validateAsync(req.body)
+      userRegisterValue = await userRegisterValidator.validateAsync(req.body)
     } catch (err) {
       return res.json(err)
     }
@@ -27,7 +28,7 @@ module.exports = {
     let hash = ''
 
     try {
-      hash = await bcrypt.hash(registerValue.confirmPassword, 10)
+      hash = await bcrypt.hash(userRegisterValue.confirmPassword, 10)
     } catch (err) {
       res.statusCode = 500
       return res.json()
@@ -35,15 +36,64 @@ module.exports = {
 
     // check if user exists in DB
 
-    let user = await findUser(registerValue.email)
-    let partner = await findUser(registerValue.partner_email)
+    let user = await findUser(userRegisterValue.email)
+
+    if (user) {
+      res.statusCode = 409
+      return res.json('User email already exists.')
+    }
+
+    let couple_id = uuidv4()
+
+    // creates users account
+
+    try {
+      UserModel.create({
+        first_name: userRegisterValue.first_name,
+        last_name: userRegisterValue.last_name,
+        email: userRegisterValue.email,
+        role: userRegisterValue.role,
+        hash: hash,
+        couple_id: couple_id,
+      })
+      res.statusCode = 201
+      return res.json('success')
+    } catch (err) {
+      res.statusCode = 500
+      res.json(err)
+    }
+  },
+  registerPartner: async (req, res) => {
+    let partnerRegisterValue = null
+
+    try {
+      partnerRegisterValue = await registerValidator.validateAsync(req.body)
+    } catch (err) {
+      return res.json(err)
+    }
+
+    // // generate hash for password
+
+    // let hash = ''
+
+    // try {
+    //   hash = await bcrypt.hash(partnerRegisterValue.confirmPassword, 10)
+    // } catch (err) {
+    //   res.statusCode = 500
+    //   return res.json()
+    // }
+
+    // check if user exists in DB
+
+    let user = await findUser(partnerRegisterValue.email)
+    let partner = await findUser(partnerRegisterValue.partner_email)
 
     if (user || partner) {
       res.statusCode = 409
       return res.json('User or Partner email already exists.')
     }
 
-    let userRole = registerValue.role
+    let userRole = partnerRegisterValue.role
     let partnerRole = null
 
     switch (userRole) {
@@ -57,7 +107,7 @@ module.exports = {
 
     let couple_id = uuidv4()
 
-    let destination = await googApi(registerValue.d_destination)
+    let destination = await googApi(userRegisterValue.d_destination)
 
     if (!destination) {
       return res.json(destination)
@@ -68,37 +118,37 @@ module.exports = {
     try {
       UserModel.insertMany([
         {
-          first_name: registerValue.first_name,
-          last_name: registerValue.last_name,
-          email: registerValue.email,
-          partner_first_name: registerValue.partner_first_name,
-          partner_last_name: registerValue.partner_last_name,
-          partner_email: registerValue.partner_email,
-          role: registerValue.role,
+          first_name: userRegisterValue.first_name,
+          last_name: userRegisterValue.last_name,
+          email: userRegisterValue.email,
+          partner_first_name: userRegisterValue.partner_first_name,
+          partner_last_name: userRegisterValue.partner_last_name,
+          partner_email: userRegisterValue.partner_email,
+          role: userRegisterValue.role,
           hash: hash,
-          d_date: registerValue.d_date,
+          d_date: userRegisterValue.d_date,
           d_destination: {
             name: destination.data.results[0].name,
             formatted_address: destination.data.results[0].formatted_address,
           },
-          e_budget: registerValue.e_budget,
+          e_budget: userRegisterValue.e_budget,
           couple_id: couple_id,
         },
         {
-          first_name: registerValue.partner_first_name,
-          last_name: registerValue.partner_last_name,
-          email: registerValue.partner_email,
-          partner_first_name: registerValue.first_name,
-          partner_last_name: registerValue.last_name,
-          partner_email: registerValue.email,
+          first_name: userRegisterValue.partner_first_name,
+          last_name: userRegisterValue.partner_last_name,
+          email: userRegisterValue.partner_email,
+          partner_first_name: userRegisterValue.first_name,
+          partner_last_name: userRegisterValue.last_name,
+          partner_email: userRegisterValue.email,
           role: partnerRole,
           hash: hash,
-          d_date: registerValue.d_date,
+          d_date: userRegisterValue.d_date,
           d_destination: {
             name: destination.data.results[0].name,
             formatted_address: destination.data.results[0].formatted_address,
           },
-          e_budget: registerValue.e_budget,
+          e_budget: userRegisterValue.e_budget,
           couple_id: couple_id,
         },
       ])
