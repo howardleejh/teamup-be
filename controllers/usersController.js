@@ -240,9 +240,11 @@ module.exports = {
 
     let couple_id = user.couple_id
 
-    let countdown = await res.json(
-      `${user.first_name} ${user.last_name} dashboard`
-    )
+    let now = moment().iso()
+
+    console.log(now)
+
+    res.json(`Today: ${now} Welcome ${user.first_name} ${user.last_name}`)
   },
   userProfile: async (req, res) => {
     let user = await findUser(res.locals.user.email)
