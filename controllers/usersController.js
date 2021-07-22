@@ -246,13 +246,13 @@ module.exports = {
 
     let budget = {
       initialBudget: parseFloat(user.e_budget),
-      currentBudget: '',
+      currentBudget: parseFloat(user.e_budget),
       totalItems: await BudgetModel.countDocuments({
         couple_id: user.couple_id,
       }),
     }
 
-    let budgetItems = ''
+    let budgetItems = null
     try {
       budgetItems = await BudgetModel.find({
         couple_id: user.couple_id,
@@ -262,7 +262,7 @@ module.exports = {
     }
 
     budgetItems.forEach((item) => {
-      budget.currentBudget = user.e_budget + parseFloat(item.amount)
+      budget.currentBudget += parseFloat(item.amount)
     })
 
     let guests = {

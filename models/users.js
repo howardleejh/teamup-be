@@ -42,7 +42,7 @@ const userSchema = new mongoose.Schema(
       formatted_address: String,
     },
     e_budget: {
-      type: mongoose.Schema.Types.Decimal128,
+      type: String,
     },
     couple_id: {
       type: String,

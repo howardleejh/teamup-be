@@ -13,7 +13,7 @@ const budgetSchema = new mongoose.Schema(
       required: true,
     },
     amount: {
-      type: mongoose.Schema.Types.Decimal128,
+      type: String,
       required: true,
     },
     payment_type: {
