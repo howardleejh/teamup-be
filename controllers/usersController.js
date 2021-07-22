@@ -103,14 +103,12 @@ module.exports = {
       await sendMail(
         'vault2howard@gmail.com',
         'Change of Password',
-        // `http://www.google.com/${userActivateRoute}`
-        `https://www.google.com/`
+        `https://teamup-be.herokuapp.com/api/v1/${userActivateRoute}`
       )
       await sendMail(
         'vault2howard@gmail.com',
         'Change of Password',
-        // `http://www.google.com/${partnerActivateRoute}`
-        `https://www.google.com/`
+        `https://teamup-be.herokuapp.com/api/v1/${partnerActivateRoute}`
       )
     } catch (err) {
       return res.json(err)
@@ -238,13 +236,81 @@ module.exports = {
   dashboard: async (req, res) => {
     let user = await findUser(res.locals.user.email)
 
-    let couple_id = user.couple_id
+    let calendar = {
+      now: moment().format(),
+      dayOfEvent: moment(user.d_date).format(),
+      daysLeft: null,
+    }
 
-    let now = moment().iso()
+    calendar.daysLeft = moment(user.d_date).diff(calendar.now, 'days')
 
-    console.log(now)
+    let budget = {
+      initialBudget: parseFloat(user.e_budget),
+      currentBudget: '',
+      totalItems: await BudgetModel.countDocuments({
+        couple_id: user.couple_id,
+      }),
+    }
 
-    res.json(`Today: ${now} Welcome ${user.first_name} ${user.last_name}`)
+    let budgetItems = ''
+    try {
+      budgetItems = await BudgetModel.find({
+        couple_id: user.couple_id,
+      })
+    } catch (err) {
+      return err
+    }
+
+    budgetItems.forEach((item) => {
+      budget.currentBudget = budget.initialBudget + parseFloat(item.amount)
+    })
+
+    let guests = {
+      attending: await GuestModel.countDocuments({
+        couple_id: user.couple_id,
+        status: 'attending',
+      }),
+      unavailable: await GuestModel.countDocuments({
+        couple_id: user.couple_id,
+        status: 'unavailable',
+      }),
+      pending: await GuestModel.countDocuments({
+        couple_id: user.couple_id,
+        status: 'pending',
+      }),
+      total: await GuestModel.countDocuments({
+        couple_id: user.couple_id,
+      }),
+    }
+
+    let todos = {
+      inProgress: await TodoModel.countDocuments({
+        couple_id: user.couple_id,
+        status: 'in progress',
+      }),
+      completed: await TodoModel.countDocuments({
+        couple_id: user.couple_id,
+        status: 'completed',
+      }),
+      total: await GuestModel.countDocuments({
+        couple_id: user.couple_id,
+      }),
+    }
+
+    let events = {
+      total: await EventModel.countDocuments({
+        couple_id: user.couple_id,
+      }),
+    }
+
+    res.json({
+      message: `Welcome ${user.first_name} ${user.last_name}`,
+      calendar,
+      budget,
+      guests,
+      todos,
+      events,
+    })
   },
   userProfile: async (req, res) => {
     let user = await findUser(res.locals.user.email)
