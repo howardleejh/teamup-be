@@ -262,7 +262,7 @@ module.exports = {
     }
 
     budgetItems.forEach((item) => {
-      budget.currentBudget = budget.initialBudget + parseFloat(item.amount)
+      budget.currentBudget = user.e_budget + parseFloat(item.amount)
     })
 
     let guests = {
