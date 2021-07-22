@@ -8,12 +8,14 @@ const mg = mailgun({
 })
 
 module.exports = {
-  sendMail: async (recipient, subject, text) => {
+  sendMail: async (recipient, subject, link) => {
     const data = {
       from: 'Admin <admin@TeamUp.mailgun.org>',
       to: recipient,
       subject: subject,
-      text: text,
+      html: `<html>Please click on the following link to change your password immediately:
+      <br><br/>
+      <a href=${link}>${link}</a></html>`,
     }
     mg.messages().send(data, (error, body) => {
       console.log(body)

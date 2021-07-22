@@ -3,7 +3,6 @@
 const { UserModel } = require('../models/users')
 const {
   userRegisterValidator,
-  partnerRegisterValidator,
   loginValidator,
 } = require('../validatations/userValidate')
 const bcrypt = require('bcrypt')
@@ -25,59 +24,88 @@ module.exports = {
       return res.json(err)
     }
 
-    const fullName = userInput.fullName.split(' ')
-    const firstName = fullName[0]
-    const lastName = fullName[1]
+    const user_fullName = userInput.user_fullName.split(' ')
+    const user_firstName = user_fullName[0]
+    const user_lastName = user_fullName[1]
+
+    const partner_fullName = userInput.partner_fullName.split(' ')
+    const partner_firstName = partner_fullName[0]
+    const partner_lastName = partner_fullName[1]
 
     // generate hash for password
 
-    let hash = ''
-
-    try {
-      hash = await bcrypt.hash(randomstring.generate(), 10)
-    } catch (err) {
-      res.statusCode = 500
-      return res.json(err)
-    }
+    let userHash = randomstring.generate()
+    let partnerHash = randomstring.generate()
 
     // check if user exists in DB
 
-    let user = await findUser(userInput.email)
+    let user = await findUser(userInput.user_email)
+    let partner = await findUser(userInput.partner_email)
 
-    if (user) {
+    if (user || partner) {
       res.statusCode = 409
-      return res.json('User email already exists.')
+      return res.json('User or Partner email already exists.')
+    }
+
+    let userRole = userInput.user_role
+    let partnerRole = null
+
+    switch (userRole) {
+      case 'groom':
+        partnerRole = 'bride'
+        break
+      case 'bride':
+        partnerRole = 'groom'
+        break
     }
 
     let couple_id = uuidv4()
 
-    let userQuery = randomstring.generate(128)
+    let userActivateRoute = randomstring.generate(128)
+    let partnerActivateRoute = randomstring.generate(128)
 
     // creates users account
 
     try {
-      UserModel.create({
-        first_name: firstName,
-        last_name: lastName,
-        email: userInput.email,
-        role: userInput.role,
-        hash: hash,
-        couple_id: couple_id,
-        active: false,
-        activation: userQuery,
-      })
+      await UserModel.insertMany([
+        {
+          first_name: user_firstName,
+          last_name: user_lastName,
+          email: userInput.user_email,
+          role: userRole,
+          hash: userHash,
+          couple_id: couple_id,
+          active: false,
+          activation: userActivateRoute,
+        },
+        {
+          first_name: partner_firstName,
+          last_name: partner_lastName,
+          email: userInput.partner_email,
+          role: partnerRole,
+          hash: partnerHash,
+          couple_id: couple_id,
+          active: false,
+          activation: partnerActivateRoute,
+        },
+      ])
     } catch (err) {
       res.statusCode = 500
       return res.json(err)
     }
 
     try {
-      sendMail(
+      await sendMail(
         'vault2howard@gmail.com',
         'Change of Password',
-        `Please click on the following link to change your password immediately: 
-        
-        http://localhost:3000/api/v1/pass/${userQuery}`
+        // `http://www.google.com/${userActivateRoute}`
+        `https://www.google.com/`
+      )
+      await sendMail(
+        'vault2howard@gmail.com',
+        'Change of Password',
+        // `http://www.google.com/${partnerActivateRoute}`
+        `https://www.google.com/`
       )
     } catch (err) {
       return res.json(err)
@@ -131,6 +159,9 @@ module.exports = {
             hash: hash,
             active: true,
           },
+          $unset: {
+            activation: '',
+          },
         }
       )
       res.json('success')
@@ -138,81 +169,6 @@ module.exports = {
       res.statusCode = 500
       return res.json(err)
     }
-  },
-  registerPartner: async (req, res) => {
-    let user = await findUser(res.locals.user.email)
-
-    const fullName = req.body.fullName.split(' ')
-    const firstName = fullName[0]
-    const lastName = fullName[1]
-
-    // generate hash for password
-
-    let hash = ''
-
-    try {
-      hash = await bcrypt.hash(randomstring.generate(), 10)
-    } catch (err) {
-      res.statusCode = 500
-      return res.json()
-    }
-
-    // check if partner exists in DB
-
-    let partner = await findUser(req.body.email)
-
-    if (partner) {
-      res.statusCode = 409
-      return res.json('Partner email already exists.')
-    }
-
-    let userRole = user.role
-    let partnerRole = null
-
-    switch (userRole) {
-      case 'groom':
-        partnerRole = 'bride'
-        break
-      case 'bride':
-        partnerRole = 'groom'
-        break
-    }
-
-    let couple_id = user.couple_id
-
-    let userQuery = randomstring.generate(128)
-
-    // // creates users account
-
-    try {
-      UserModel.create({
-        first_name: firstName,
-        last_name: lastName,
-        email: req.body.email,
-        role: partnerRole,
-        hash: hash,
-        couple_id: couple_id,
-        active: false,
-        activation: userQuery,
-      })
-    } catch (err) {
-      res.statusCode = 500
-      return res.json(err)
-    }
-
-    try {
-      sendMail(
-        'vault2howard@gmail.com',
-        'Change of Password',
-        `Please click on the following link to change your password immediately:
-
-        http://localhost:3000/api/v1/${userQuery}`
-      )
-    } catch (err) {
-      return res.json(err)
-    }
-    res.statusCode = 201
-    return res.json('success')
   },
   login: async (req, res) => {
     let loginValue = null

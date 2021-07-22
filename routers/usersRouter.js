@@ -6,7 +6,9 @@ const usersController = require('../controllers/usersController')
 const guestsController = require('../controllers/guestsController')
 const { userAuth, guestAuth } = require('../middlewares/userAuth')
 
-router.delete('/users/profile/delete', userAuth, usersController.deleteUser)
+router.get('/users/profile', userAuth, usersController.userProfile)
+
+router.get('/users/dashboard', userAuth, usersController.dashboard)
 
 router.patch(
   '/users/profile/update',
@@ -14,15 +16,7 @@ router.patch(
   usersController.updateUserProfile
 )
 
-router.get('/users/profile', userAuth, usersController.userProfile)
-
-router.get('/users/dashboard', userAuth, usersController.dashboard)
-
-router.post(
-  '/users/partner/register',
-  userAuth,
-  usersController.registerPartner
-)
+router.delete('/users/profile/delete', userAuth, usersController.deleteUser)
 
 router.post('/register', usersController.register)
 
