@@ -1,6 +1,6 @@
 'use strict'
 
-const { EventItemModel } = require('../models/events')
+const { EventModel } = require('../models/events')
 const { createEventValidator } = require('../validatations/eventValidate')
 const { googApi } = require('../services/googleApi')
 
@@ -8,7 +8,7 @@ module.exports = {
   findList: async (user) => {
     let list = null
     try {
-      list = await EventItemModel.find({
+      list = await EventModel.find({
         couple_id: user,
       })
     } catch (err) {
@@ -24,7 +24,7 @@ module.exports = {
   findItem: async (itemId) => {
     let item = null
     try {
-      item = await EventItemModel.find({
+      item = await EventModel.find({
         _id: itemId,
       })
     } catch (err) {
@@ -53,7 +53,7 @@ module.exports = {
     }
 
     try {
-      await EventItemModel.create({
+      await EventModel.create({
         event_name: createItemVal.event_name,
         from: createItemVal.from,
         to: createItemVal.to,
@@ -85,7 +85,7 @@ module.exports = {
     }
 
     try {
-      await EventItemModel.findOneAndUpdate(
+      await EventModel.findOneAndUpdate(
         {
           _id: itemId,
         },
@@ -110,7 +110,7 @@ module.exports = {
   },
   deleteItem: async (itemId) => {
     try {
-      await EventItemModel.findOneAndDelete({
+      await EventModel.findOneAndDelete({
         _id: itemId,
       })
     } catch (err) {

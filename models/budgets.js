@@ -6,7 +6,7 @@ const mongoose = require('mongoose')
 //         Schema Creation
 //=========================================
 
-const budgetItemSchema = new mongoose.Schema(
+const budgetSchema = new mongoose.Schema(
   {
     item_name: {
       type: String,
@@ -45,8 +45,8 @@ const budgetItemSchema = new mongoose.Schema(
   }
 )
 
-const budgetItemModel = mongoose.model('budget', budgetItemSchema)
+const budgetModel = mongoose.model('budget', budgetSchema)
 
 module.exports = {
-  BudgetItemModel: budgetItemModel,
+  BudgetModel: budgetModel,
 }

@@ -1,6 +1,11 @@
 'use strict'
 
 const { UserModel } = require('../models/users')
+const { TodoModel } = require('../models/todos')
+const { GuestModel } = require('../models/guests')
+const { EventModel } = require('../models/events')
+const { BudgetModel } = require('../models/budgets')
+
 const {
   userRegisterValidator,
   loginValidator,
@@ -233,7 +238,11 @@ module.exports = {
   dashboard: async (req, res) => {
     let user = await findUser(res.locals.user.email)
 
-    res.json(`${user.first_name} ${user.last_name} dashboard`)
+    let couple_id = user.couple_id
+
+    let countdown = await res.json(
+      `${user.first_name} ${user.last_name} dashboard`
+    )
   },
   userProfile: async (req, res) => {
     let user = await findUser(res.locals.user.email)

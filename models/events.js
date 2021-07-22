@@ -6,7 +6,7 @@ const mongoose = require('mongoose')
 //         Schema Creation
 //=========================================
 
-const eventItemSchema = new mongoose.Schema(
+const eventSchema = new mongoose.Schema(
   {
     event_name: {
       type: String,
@@ -38,8 +38,8 @@ const eventItemSchema = new mongoose.Schema(
   }
 )
 
-const eventItemModel = mongoose.model('event', eventItemSchema)
+const eventModel = mongoose.model('event', eventSchema)
 
 module.exports = {
-  EventItemModel: eventItemModel,
+  EventModel: eventModel,
 }

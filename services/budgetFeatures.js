@@ -1,13 +1,13 @@
 'use strict'
 
-const { BudgetItemModel } = require('../models/budgets')
+const { BudgetModel } = require('../models/budgets')
 const { createBudgetValidator } = require('../validatations/budgetValidate')
 
 module.exports = {
   findList: async (user) => {
     let list = null
     try {
-      list = await BudgetItemModel.find({
+      list = await BudgetModel.find({
         couple_id: user,
       })
     } catch (err) {
@@ -23,7 +23,7 @@ module.exports = {
   findItem: async (itemId) => {
     let item = null
     try {
-      item = await BudgetItemModel.find({
+      item = await BudgetModel.find({
         _id: itemId,
       })
     } catch (err) {
@@ -46,7 +46,7 @@ module.exports = {
     }
 
     try {
-      await BudgetItemModel.create({
+      await BudgetModel.create({
         item_name: createItemVal.item_name,
         amount: createItemVal.amount,
         payment_type: createItemVal.payment_type,
@@ -70,7 +70,7 @@ module.exports = {
     }
 
     try {
-      await BudgetItemModel.findOneAndUpdate(
+      await BudgetModel.findOneAndUpdate(
         {
           _id: itemId,
         },
@@ -92,7 +92,7 @@ module.exports = {
   },
   deleteItem: async (itemId) => {
     try {
-      await BudgetItemModel.findOneAndDelete({
+      await BudgetModel.findOneAndDelete({
         _id: itemId,
       })
     } catch (err) {
