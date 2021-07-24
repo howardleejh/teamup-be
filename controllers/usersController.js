@@ -267,31 +267,46 @@ module.exports = {
     })
 
     let guests = {
-      attending: null,
-      unavailable: null,
-      pending: null,
-      total: null,
+      bride: {
+        attending: null,
+        unavailable: null,
+        pending: null,
+        total: null,
+      },
+      groom: {
+        attending: null,
+        unavailable: null,
+        pending: null,
+        total: null,
+      },
+      totalGuests: null,
     }
 
-    async function calculateGuests(status) {
+    async function calculateGuests(role, status) {
       let guestStatus = await GuestModel.find({
         couple_id: user.couple_id,
+        role: role,
         status: status,
       })
 
       if (guestStatus.length === 0) {
-        guests[status] = 0
+        guests[role][status] = 0
         return
       }
       guestStatus.forEach((item) => {
-        guests[status] += item.pax
+        guests[role][status] += item.pax
       })
-      guests.total += guests[status]
+      guests[role].total += guests[role][status]
+      guests.totalGuests += guests[role][status]
     }
 
-    calculateGuests('pending')
-    calculateGuests('unavailable')
-    calculateGuests('attending')
+    calculateGuests('bride', 'pending')
+    calculateGuests('bride', 'unavailable')
+    calculateGuests('bride', 'attending')
+
+    calculateGuests('groom', 'pending')
+    calculateGuests('groom', 'unavailable')
+    calculateGuests('groom', 'attending')
 
     let todos = {
       inProgress: await TodoModel.countDocuments({
