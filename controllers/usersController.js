@@ -18,6 +18,7 @@ const { findUser } = require('../services/findUser')
 const { googApi } = require('../services/googleApi')
 const randomstring = require('randomstring')
 const { sendMail } = require('../services/emailService')
+const guests = require('../models/guests')
 
 module.exports = {
   register: async (req, res) => {
@@ -266,22 +267,31 @@ module.exports = {
     })
 
     let guests = {
-      attending: await GuestModel.countDocuments({
-        couple_id: user.couple_id,
-        status: 'attending',
-      }),
-      unavailable: await GuestModel.countDocuments({
-        couple_id: user.couple_id,
-        status: 'unavailable',
-      }),
-      pending: await GuestModel.countDocuments({
-        couple_id: user.couple_id,
-        status: 'pending',
-      }),
-      total: await GuestModel.countDocuments({
-        couple_id: user.couple_id,
-      }),
+      attending: null,
+      unavailable: null,
+      pending: null,
+      total: null,
     }
+
+    async function calculateGuests(status) {
+      let guestStatus = await GuestModel.find({
+        couple_id: user.couple_id,
+        status: status,
+      })
+
+      if (guestStatus.length === 0) {
+        guests[status] = 0
+        return
+      }
+      guestStatus.forEach((item) => {
+        guests[status] += item.pax
+      })
+      guests.total += guests[status]
+    }
+
+    calculateGuests('pending')
+    calculateGuests('unavailable')
+    calculateGuests('attending')
 
     let todos = {
       inProgress: await TodoModel.countDocuments({
