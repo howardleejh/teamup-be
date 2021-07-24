@@ -12,6 +12,6 @@ module.exports = {
       .valid('pending', 'attending', 'unavailable')
       .default('pending')
       .required(),
-    pax: Joi.number().required(),
+    pax: Joi.number().integer().required(),
   }),
 }
