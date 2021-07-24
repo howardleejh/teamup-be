@@ -286,11 +286,11 @@ module.exports = {
     let todos = {
       inProgress: await TodoModel.countDocuments({
         couple_id: user.couple_id,
-        status: 'in progress',
+        status: false,
       }),
       completed: await TodoModel.countDocuments({
         couple_id: user.couple_id,
-        status: 'completed',
+        status: true,
       }),
       total: await GuestModel.countDocuments({
         couple_id: user.couple_id,
