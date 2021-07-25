@@ -279,6 +279,9 @@ module.exports = {
         pending: null,
         total: null,
       },
+      totalAttending: null,
+      totalUnavailable: null,
+      totalPending: null,
       totalGuests: null,
     }
 
@@ -298,6 +301,10 @@ module.exports = {
       })
       guests[role].total += guests[role][status]
       guests.totalGuests += guests[role][status]
+      guests.totalAttending = guests.bride.attending + guests.groom.attending
+      guests.totalUnavailable =
+        guests.bride.unavailable + guests.groom.unavailable
+      guests.totalPending = guests.bride.pending + guests.groom.pending
     }
 
     calculateGuests('bride', 'pending')
