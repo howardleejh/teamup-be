@@ -104,12 +104,12 @@ module.exports = {
       await sendMail(
         userInput.user_email,
         'Change of Password',
-        `http://teamup-fe.herokuapp.com/register/change-password/${userActivateRoute}`
+        `https://teamup-fe.herokuapp.com/register/change-password/${userActivateRoute}`
       )
       await sendMail(
         userInput.partner_email,
         'Change of Password',
-        `http://teamup-fe.herokuapp.com/register/change-password/${partnerActivateRoute}`
+        `https://teamup-fe.herokuapp.com/register/change-password/${partnerActivateRoute}`
       )
     } catch (err) {
       return res.json(err)
