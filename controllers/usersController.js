@@ -117,7 +117,7 @@ module.exports = {
     res.statusCode = 201
     return res.json({
       userRegisterId: userActivateRoute,
-      partnerRegisterId: userActivateRoute,
+      partnerRegisterId: partnerActivateRoute,
       message: 'success',
     })
   },
