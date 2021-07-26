@@ -324,7 +324,7 @@ module.exports = {
         couple_id: user.couple_id,
         status: true,
       }),
-      total: await GuestModel.countDocuments({
+      total: await TodoModel.countDocuments({
         couple_id: user.couple_id,
       }),
     }
