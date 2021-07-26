@@ -115,7 +115,11 @@ module.exports = {
       return res.json(err)
     }
     res.statusCode = 201
-    return res.json('success')
+    return res.json({
+      userRegisterId: userActivateRoute,
+      partnerRegisterId: userActivateRoute,
+      message: 'success',
+    })
   },
   newUserPassChange: async (req, res) => {
     let userId = req.params.userRoute
