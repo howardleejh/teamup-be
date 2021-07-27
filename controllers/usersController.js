@@ -192,7 +192,7 @@ module.exports = {
     let user = await findUser(loginValue.email)
 
     if (!user) {
-      res.statusCode = 400
+      res.statusCode = 401
       return res.json({
         success: false,
         message: 'Given email or password is incorrect',
@@ -211,6 +211,7 @@ module.exports = {
     // if password is incorrect
 
     if (!isPasswordCorrect) {
+      res.statusCode = 401
       return res.json({
         success: false,
         message: 'Given email or password is incorrect',
