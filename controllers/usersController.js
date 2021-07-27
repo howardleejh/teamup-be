@@ -211,7 +211,6 @@ module.exports = {
     // if password is incorrect
 
     if (!isPasswordCorrect) {
-      res.statusCode = 400
       return res.json({
         success: false,
         message: 'Given email or password is incorrect',
