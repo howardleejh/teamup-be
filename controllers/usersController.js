@@ -27,6 +27,7 @@ module.exports = {
     try {
       userInput = await userRegisterValidator.validateAsync(req.body)
     } catch (err) {
+      res.statusCode = 500
       return res.json(err)
     }
 
@@ -184,6 +185,7 @@ module.exports = {
     try {
       loginValue = await loginValidator.validateAsync(req.body)
     } catch (err) {
+      res.statusCode = 500
       return res.json(err)
     }
 
@@ -199,6 +201,8 @@ module.exports = {
       })
     }
 
+    console.log(1)
+
     let isPasswordCorrect = false
 
     try {
@@ -208,6 +212,7 @@ module.exports = {
       return res.json(err)
     }
 
+    console.log(2)
     // if password is incorrect
 
     if (!isPasswordCorrect) {
@@ -217,6 +222,8 @@ module.exports = {
         message: 'Given email or password is incorrect',
       })
     }
+
+    console.log(3)
 
     let expiresAt = moment().add(24, 'hour').toString()
 
@@ -231,12 +238,12 @@ module.exports = {
         expiresIn: '24h',
       }
     )
-
     res.json({
       token: token,
       expiresAt: expiresAt,
       message: 'success',
     })
+    return
   },
   dashboard: async (req, res) => {
     let user = await findUser(res.locals.user.email)
