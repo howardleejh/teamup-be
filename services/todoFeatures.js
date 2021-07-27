@@ -14,10 +14,6 @@ module.exports = {
       return err
     }
 
-    if (list.length === 0) {
-      return 'there are no items in the list'
-    }
-
     return list
   },
   findItem: async (itemId) => {
@@ -28,10 +24,6 @@ module.exports = {
       })
     } catch (err) {
       return err
-    }
-
-    if (!item) {
-      return 'there is no item available'
     }
 
     return item
