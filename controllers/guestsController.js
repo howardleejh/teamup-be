@@ -2,6 +2,8 @@
 
 const { findUser } = require('../services/findUser')
 const useFeatures = require('../services/guestFeatures')
+const jwt = require('jsonwebtoken')
+const { findItem } = require('../services/guestFeatures')
 
 module.exports = {
   guestList: async (req, res) => {
@@ -67,7 +69,20 @@ module.exports = {
 
   loginGuest: async (req, res) => {
     let guest = res.locals.user
+    res.json(guest)
+    return
+  },
+  guestRsvp: async (req, res) => {
+    let guestId = req.params.guestId
 
-    res.json(`${guest.guest_first_name} is logged in`)
+    let guestItem = null
+
+    try {
+      guestItem = await findItem(guestId)
+    } catch (err) {
+      return err
+    }
+
+    return res.json(guestItem)
   },
 }

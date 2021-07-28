@@ -18,7 +18,6 @@ const { findUser } = require('../services/findUser')
 const { googApi } = require('../services/googleApi')
 const randomstring = require('randomstring')
 const { sendMail } = require('../services/emailService')
-const guests = require('../models/guests')
 
 module.exports = {
   register: async (req, res) => {
@@ -201,8 +200,6 @@ module.exports = {
       })
     }
 
-    console.log(1)
-
     let isPasswordCorrect = false
 
     try {
@@ -212,7 +209,6 @@ module.exports = {
       return res.json(err)
     }
 
-    console.log(2)
     // if password is incorrect
 
     if (!isPasswordCorrect) {
@@ -222,8 +218,6 @@ module.exports = {
         message: 'Given email or password is incorrect',
       })
     }
-
-    console.log(3)
 
     let expiresAt = moment().add(24, 'hour').toString()
 

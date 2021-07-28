@@ -24,6 +24,4 @@ router.post('/login', usersController.login)
 
 router.post('/:userRoute', usersController.newUserPassChange)
 
-router.post('/guests/login', guestAuth, guestsController.loginGuest)
-
 module.exports = router
