@@ -400,6 +400,10 @@ module.exports = {
       }
     }
 
+    const user_fullName = req.body.user_fullName.split(' ')
+    const user_firstName = user_fullName[0]
+    const user_lastName = user_fullName[1]
+
     try {
       await UserModel.findOneAndUpdate(
         {
@@ -407,8 +411,8 @@ module.exports = {
         },
         {
           $set: {
-            first_name: req.body.first_name || user.first_name,
-            last_name: req.body.last_name || user.last_name,
+            first_name: user_firstName || user.first_name,
+            last_name: user_lastName || user.last_name,
             email: req.body.email || user.email,
             hash: newHash,
           },
