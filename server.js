@@ -5,6 +5,7 @@
 // =====================================
 require('dotenv').config()
 const express = require('express')
+const cors = require('cors')
 const mongoose = require('mongoose')
 
 // =====================================
@@ -18,7 +19,6 @@ const eventsRouter = require('./routers/eventsRouter')
 const guestsRouter = require('./routers/guestsRouter')
 
 const app = express()
-const cors = require('cors')
 const port = process.env.PORT || 8000
 
 // =====================================
