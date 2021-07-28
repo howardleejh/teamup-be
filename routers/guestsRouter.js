@@ -11,7 +11,7 @@ router.post('/create', userAuth, guestsController.createGuest)
 
 router.get('/:guestId', userAuth, guestsController.guest)
 
-router.post('/:guestId/rsvp', guestsController.guestRsvp)
+router.patch('/:guestId/rsvp', guestsController.guestRsvp)
 
 router.post('/login', guestAuth, guestsController.loginGuest)
 

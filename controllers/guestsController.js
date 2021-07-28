@@ -2,8 +2,7 @@
 
 const { findUser } = require('../services/findUser')
 const useFeatures = require('../services/guestFeatures')
-const jwt = require('jsonwebtoken')
-const { findItem } = require('../services/guestFeatures')
+const { GuestModel } = require('../models/guests')
 
 module.exports = {
   guestList: async (req, res) => {
@@ -75,14 +74,23 @@ module.exports = {
   guestRsvp: async (req, res) => {
     let guestId = req.params.guestId
 
-    let guestItem = null
-
     try {
-      guestItem = await findItem(guestId)
+      await GuestModel.findOneAndUpdate(
+        {
+          _id: guestId,
+        },
+        {
+          $set: {
+            role: req.body.role,
+            status: req.body.status,
+            pax: req.body.pax,
+          },
+        }
+      )
     } catch (err) {
-      return err
+      return res.json(err)
     }
 
-    return res.json(guestItem)
+    return res.json('success')
   },
 }
