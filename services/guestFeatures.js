@@ -37,10 +37,14 @@ module.exports = {
       return err
     }
 
+    const guest_fullName = createItemVal.guest_fullName.split(' ')
+    const guest_firstName = guest_fullName[0]
+    const guest_lastName = guest_fullName[1]
+
     try {
       await GuestModel.create({
-        guest_first_name: createItemVal.guest_first_name,
-        guest_last_name: createItemVal.guest_last_name,
+        guest_first_name: guest_firstName,
+        guest_last_name: guest_lastName,
         guest_contact: createItemVal.guest_contact,
         role: createItemVal.role,
         status: createItemVal.status,
