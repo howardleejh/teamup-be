@@ -9,7 +9,6 @@ module.exports = {
     role: Joi.string().valid('bride', 'groom').required(),
     status: Joi.string()
       .valid('pending', 'attending', 'unavailable')
-      .default('pending')
       .required(),
     pax: Joi.number().integer().required(),
   }),
