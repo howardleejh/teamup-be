@@ -65,6 +65,10 @@ module.exports = {
       return err
     }
 
+    const guest_fullName = updateItemVal.guest_fullName.split(' ')
+    const guest_firstName = guest_fullName[0]
+    const guest_lastName = guest_fullName[1]
+
     try {
       await GuestModel.findOneAndUpdate(
         {
@@ -72,8 +76,8 @@ module.exports = {
         },
         {
           $set: {
-            guest_first_name: updateItemVal.guest_first_name,
-            guest_last_name: updateItemVal.guest_last_name,
+            guest_first_name: guest_firstName,
+            guest_last_name: guest_lastName,
             guest_contact: updateItemVal.guest_contact,
             role: updateItemVal.role,
             status: updateItemVal.status,
