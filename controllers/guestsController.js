@@ -29,6 +29,7 @@ module.exports = {
     try {
       user = await findUser(userEmail)
     } catch (err) {
+      res.statusCode = 500
       return res.json(err)
     }
 
@@ -48,6 +49,7 @@ module.exports = {
     let updateItem = await useFeatures.updateItem(itemId, req.body)
 
     if (updateItem !== 'success') {
+      res.statusCode = 500
       return res.json(updateItem)
     }
 
@@ -60,6 +62,7 @@ module.exports = {
     let deleteItem = await useFeatures.deleteItem(itemId)
 
     if (deleteItem !== 'success') {
+      res.statusCode = 500
       return res.json(deleteItem)
     }
 
@@ -88,6 +91,7 @@ module.exports = {
         }
       )
     } catch (err) {
+      res.statusCode = 500
       return res.json(err)
     }
 

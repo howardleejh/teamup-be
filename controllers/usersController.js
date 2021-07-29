@@ -264,6 +264,7 @@ module.exports = {
         couple_id: user.couple_id,
       })
     } catch (err) {
+      res.statusCode = 500
       return err
     }
 
@@ -370,6 +371,7 @@ module.exports = {
       try {
         newHash = await bcrypt.hash(req.body.password, 10)
       } catch (err) {
+        res.statusCode = 500
         return err
       }
     }
@@ -390,6 +392,7 @@ module.exports = {
           formatted_address: response.data.results[0].formatted_address,
         }
       } catch (err) {
+        res.statusCode = 500
         return err
       }
     }
