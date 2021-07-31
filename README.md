@@ -1,6 +1,6 @@
 <h1>TeamUp Back End</h1>
 
-This is a project created to support the TeamUp web app on the front end.
+This is a project created to support the <a href="https://teamup-fe.herokuapp.com/">TeamUp</a> web app on the front end.
 
 <h5>OBJECTIVE: An all-in-one App to streamline wedding planning process & Manage your budget at your fingertips. </h5>
   
