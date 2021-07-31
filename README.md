@@ -1,4 +1,4 @@
-<h1>TeamUp Back End</h1>
+<h1>TeamUp! Back End</h1>
 
 This is a project created to support the <a href="https://teamup-fe.herokuapp.com/">TeamUp</a> web app on the front end.
 
