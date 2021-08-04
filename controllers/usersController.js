@@ -172,7 +172,7 @@ module.exports = {
           },
         }
       )
-      res.json('success')
+      res.json({ message: 'success' })
     } catch (err) {
       res.statusCode = 500
       return res.json(err)
@@ -405,7 +405,7 @@ module.exports = {
       return res.json(err)
     }
 
-    return res.json('success')
+    return res.json({ message: 'success' })
   },
   updateUserProfile: async (req, res) => {
     let user = await findUser(res.locals.user.email)
@@ -488,7 +488,7 @@ module.exports = {
       return res.json(err)
     }
 
-    return res.json('success')
+    return res.json({ message: 'success' })
   },
   deleteUser: async (req, res) => {
     let user = await findUser(res.locals.user.email)
@@ -510,7 +510,7 @@ module.exports = {
         return res.json(err)
       }
       res.statusCode = 204
-      return res.json()
+      return res.json({ message: 'success' })
     }
 
     try {
@@ -523,6 +523,6 @@ module.exports = {
     }
 
     res.statusCode = 204
-    res.json()
+    res.json({ message: 'success' })
   },
 }
