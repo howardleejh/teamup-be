@@ -137,7 +137,7 @@ Postman can also be used to access the back end, with the following tables:
 1. Design of e-invite<br>
 2. Bugs on Event-Edit Date/ Time input<br>
 3. Dashboard Event Pagination Arrow not working<br>
-4. Budget and Date input after registration - CORS Error<br>
+<strike>4. Budget and Date input after registration - CORS Error</strike><br>
 5. Pie Chart and Dashboard<br>
 6. Dark Mode<br>
 <br>
