@@ -10,6 +10,8 @@ router.get('/users/profile', userAuth, usersController.userProfile)
 
 router.get('/users/dashboard', userAuth, usersController.dashboard)
 
+router.post('/users/date-budget-init', userAuth, usersController.userDataInt)
+
 router.patch(
   '/users/profile/update',
   userAuth,

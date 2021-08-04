@@ -360,6 +360,53 @@ module.exports = {
 
     res.json(user)
   },
+  userDataInt: async (req, res) => {
+    let user = await findUser(res.locals.user.email)
+
+    let newDestination = null
+
+    if (!req.body.d_destination || req.body.d_destination === null) {
+      newDestination = {
+        name: user.d_destination.name,
+        formatted_address: user.d_destination.formatted_address,
+      }
+    } else {
+      try {
+        let response = await googApi(req.body.d_destination)
+
+        newDestination = {
+          name: response.data.results[0].name,
+          formatted_address: response.data.results[0].formatted_address,
+        }
+      } catch (err) {
+        res.statusCode = 500
+        return err
+      }
+    }
+
+    try {
+      await UserModel.updateMany(
+        {
+          couple_id: user.couple_id,
+        },
+        {
+          $set: {
+            d_date: req.body.d_date,
+            d_destination: {
+              name: newDestination.name,
+              formatted_address: newDestination.formatted_address,
+            },
+            e_budget: req.body.e_budget,
+          },
+        }
+      )
+    } catch (err) {
+      res.statusCode = 500
+      return res.json(err)
+    }
+
+    return res.json('success')
+  },
   updateUserProfile: async (req, res) => {
     let user = await findUser(res.locals.user.email)
 
